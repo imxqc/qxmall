@@ -15,6 +15,10 @@
         <module>qxmall-ware</module>
         <module>qxmall-order</module>
         <module>qxmall-product</module>
+        <module>renren-fast</module>
+        <module>renren-generator</module>
+        <module>qxmall-common</module>
+        <module>qxmall-gateway</module>
     </modules>
 
 
