@@ -3,6 +3,8 @@ Spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
     gateway:
       routes:
         - id: baidu_route
@@ -14,8 +16,21 @@ Spring:
           uri: https://www.qq.com
           predicates:
                   - Query=url,qq
-  application:
-    name: qxmall-coupon
+
+        - id: admin_route
+          uri: lb://qxmall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+              - Path=/api/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+
 
 
 

@@ -53,6 +53,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return level1;
     }
 
+
     /**
      * 根据父分类par获取其所有的子分类并返回
      * @param par
@@ -73,5 +74,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 .collect(Collectors.toList());
         //返回父分类par的子分类集合
         return children;
+    }
+
+    @Override
+    public void removeMenuByIds(List<Long> asList) {
+        //todo 校验该菜单是否在其他地方被引用
+
+        //逻辑删除
+        baseMapper.deleteBatchIds(asList);
     }
 }
