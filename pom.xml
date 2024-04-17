@@ -19,6 +19,7 @@
         <module>renren-generator</module>
         <module>qxmall-common</module>
         <module>qxmall-gateway</module>
+        <module>qxmall-third-party</module>
     </modules>
 
 

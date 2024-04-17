@@ -3,11 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.cqx.qxmall</groupId>
-    <artifactId>qxmall-order</artifactId>
+    <artifactId>qxmall-third-party</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>qxmall-order</name>
-    <description>qxmall-order</description>
-
+    <name>qxmall-third-party</name>
+    <description>qxmall-third-party</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +19,16 @@
             <groupId>com.cqx.qxmall</groupId>
             <artifactId>qxmall-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,6 +61,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.1.0.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -72,7 +88,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.cqx.qxmall.order.QxmallOrderApplication</mainClass>
+                    <mainClass>com.cqx.qxmall.thirdparty.QxmallThirdPartyApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

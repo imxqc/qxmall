@@ -30,12 +30,22 @@ public class AttrGroupController {
     @Autowired
     private AttrGroupService attrGroupService;
 
+//    /**
+//     * 列表
+//     */
+//    @RequestMapping("/list")
+//    public R list(@RequestParam Map<String, Object> params){
+//        PageUtils page = attrGroupService.queryPage(params);
+//
+//        return R.ok().put("page", page);
+//    }
+
     /**
      * 列表
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrGroupService.queryPage(params);
+    @RequestMapping("/list/{categoryId}")
+    public R list(@RequestParam Map<String, Object> params,@PathVariable("categoryId") Long categoryId){
+        PageUtils page = attrGroupService.queryPage(params,categoryId);
 
         return R.ok().put("page", page);
     }
