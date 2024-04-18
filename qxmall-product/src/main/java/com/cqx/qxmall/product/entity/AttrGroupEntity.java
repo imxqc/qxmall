@@ -1,5 +1,6 @@
 package com.cqx.qxmall.product.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -44,5 +45,11 @@ public class AttrGroupEntity implements Serializable {
 	 * ��������id
 	 */
 	private Long catelogId;
+
+	/**
+	 * 该节点的完整路径 [父,子,孙]
+	 */
+	@TableField(exist = false)
+	private Long[] catelogPath;
 
 }
