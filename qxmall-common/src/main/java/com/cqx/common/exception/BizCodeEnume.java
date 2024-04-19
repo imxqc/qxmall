@@ -6,8 +6,8 @@ package com.cqx.common.exception;
  * @date 2024/4/17 14:43
  */
 public enum BizCodeEnume {
-    UNKNOWN_EXCEPTION(10000,"系统未知异常"),
-    VAILD_EXCEPTION(10001,"参数格式校验失败");
+    UNKNOWN_EXCEPTION(10000, "系统未知异常"),
+    VAILD_EXCEPTION(10001, "参数格式校验失败");
 
     private int code;
     private String msg;

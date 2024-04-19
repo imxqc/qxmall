@@ -6,12 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * �Ż�ȯ���Ʒ����
- * 
+ *
  * @author cqx
  * @email mnixqc@163.com
  * @date 2024-04-13 21:30:10
  */
 @Mapper
 public interface CouponSpuRelationDao extends BaseMapper<CouponSpuRelationEntity> {
-	
+
 }

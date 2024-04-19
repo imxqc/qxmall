@@ -1,6 +1,5 @@
 package com.cqx.qxmall.product.vo;
 
-
 import lombok.Data;
 
 @Data

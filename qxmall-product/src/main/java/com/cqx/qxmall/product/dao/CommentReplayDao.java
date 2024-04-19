@@ -6,12 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * ��Ʒ���ۻظ���ϵ
- * 
+ *
  * @author cqx
  * @email mnixqc@163.com
  * @date 2024-04-13 20:22:28
  */
 @Mapper
 public interface CommentReplayDao extends BaseMapper<CommentReplayEntity> {
-	
+
 }

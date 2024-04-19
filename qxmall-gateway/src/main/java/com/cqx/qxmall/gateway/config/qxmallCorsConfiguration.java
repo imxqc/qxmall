@@ -15,7 +15,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class qxmallCorsConfiguration {
 
     @Bean
-    public CorsWebFilter corsWebFilter(){
+    public CorsWebFilter corsWebFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -27,7 +27,7 @@ public class qxmallCorsConfiguration {
         corsConfiguration.setAllowCredentials(true);//允许cookie
 
         //为所有请求配置跨域
-        source.registerCorsConfiguration("/**",corsConfiguration);
+        source.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsWebFilter(source);
     }
 }

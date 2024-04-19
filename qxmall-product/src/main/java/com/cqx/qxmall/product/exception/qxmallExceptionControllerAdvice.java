@@ -21,21 +21,21 @@ import java.util.Map;
 public class qxmallExceptionControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public R handleVaildException(MethodArgumentNotValidException e){
-        log.error("数据校验出现问题{},异常类型{}",e.getMessage(),e.getClass());
+    public R handleVaildException(MethodArgumentNotValidException e) {
+        log.error("数据校验出现问题{},异常类型{}", e.getMessage(), e.getClass());
         BindingResult bindingResult = e.getBindingResult();
 
-        Map<String,String> errorMap = new HashMap<>();
+        Map<String, String> errorMap = new HashMap<>();
         bindingResult.getFieldErrors().forEach((fieldError -> {
-            errorMap.put(fieldError.getField(),fieldError.getDefaultMessage());
+            errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }));
 
-        return R.error(BizCodeEnume.VAILD_EXCEPTION.getCode(), BizCodeEnume.VAILD_EXCEPTION.getMsg()).put("data",errorMap);
+        return R.error(BizCodeEnume.VAILD_EXCEPTION.getCode(), BizCodeEnume.VAILD_EXCEPTION.getMsg()).put("data", errorMap);
     }
 
     @ExceptionHandler(Exception.class)
-    public R handleException(Throwable throwable){
-        log.error("全局异常{}",throwable);
+    public R handleException(Throwable throwable) {
+        log.error("全局异常{}", throwable);
         return R.error(BizCodeEnume.UNKNOWN_EXCEPTION.getCode(), BizCodeEnume.UNKNOWN_EXCEPTION.getMsg());
 
     }

@@ -21,7 +21,7 @@ public class MyBatisConfig {
      * 添加分页插件
      */
     @Bean
-    public PaginationInterceptor mybatisInterceptor(){
+    public PaginationInterceptor mybatisInterceptor() {
         PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
         //设置请求的页面大于最大页后的操作,true回到首页,false继续请求,默认为false
         paginationInterceptor.setOverflow(true);

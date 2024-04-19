@@ -17,7 +17,6 @@ import com.cqx.common.utils.PageUtils;
 import com.cqx.common.utils.R;
 
 
-
 /**
  * ��Ա
  *
@@ -34,20 +33,20 @@ public class MemberController {
     private CouponFeignService couponFeignService;
 
     @RequestMapping("/coupons")
-    public R test(){
+    public R test() {
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setNickname("zhangsan");
 
         R membercoupons = couponFeignService.membercoupons();
 
-        return R.ok().put("member",memberEntity).put("coupons",membercoupons.get("coupons"));
+        return R.ok().put("member", memberEntity).put("coupons", membercoupons.get("coupons"));
     }
 
     /**
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = memberService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -58,8 +57,8 @@ public class MemberController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
-		MemberEntity member = memberService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        MemberEntity member = memberService.getById(id);
 
         return R.ok().put("member", member);
     }
@@ -68,8 +67,8 @@ public class MemberController {
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody MemberEntity member){
-		memberService.save(member);
+    public R save(@RequestBody MemberEntity member) {
+        memberService.save(member);
 
         return R.ok();
     }
@@ -78,8 +77,8 @@ public class MemberController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody MemberEntity member){
-		memberService.updateById(member);
+    public R update(@RequestBody MemberEntity member) {
+        memberService.updateById(member);
 
         return R.ok();
     }
@@ -88,8 +87,8 @@ public class MemberController {
      * 删除
      */
     @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		memberService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        memberService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

@@ -52,9 +52,9 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
     public void updateDetail(BrandEntity brand) {
         //保证冗余字段的数据一致
         this.updateById(brand);
-        if(!org.springframework.util.StringUtils.isEmpty(brand.getName())){
+        if (!org.springframework.util.StringUtils.isEmpty(brand.getName())) {
             //同步更新其他关联表中的数据
-            categoryBrandRelationService.updateBrand(brand.getBrandId(),brand.getName());
+            categoryBrandRelationService.updateBrand(brand.getBrandId(), brand.getName());
 
             //TODO 更新其他关联
         }

@@ -16,7 +16,7 @@ class QxmallProductApplicationTests {
     private BrandService brandService;
 
     @Test
-    public void test(){
+    public void test() {
 //        BrandEntity brandEntity = new BrandEntity();
 //        brandEntity.setName("xiaomi");
 //
@@ -24,7 +24,7 @@ class QxmallProductApplicationTests {
 //        System.out.println("保存成功");
 
         List<BrandEntity> list = brandService.list(new QueryWrapper<BrandEntity>().eq("name", "xiaomi"));
-        list.forEach((item)->{
+        list.forEach((item) -> {
             System.out.println("item = " + item);
         });
     }

@@ -19,12 +19,26 @@ Spring:
           predicates:
             - Path=/api/thirdparty/**
           filters:
-              - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+
+        - id: ware_route
+          uri: lb://qxmall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: member_route
+          uri: lb://qxmall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
 
         - id: admin_route
           uri: lb://renren-fast
           predicates:
-              - Path=/api/**
+            - Path=/api/**
           filters:
             - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
 

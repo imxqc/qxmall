@@ -20,7 +20,7 @@ class QxmallThirdPartyApplicationTests {
     void contextLoads() throws FileNotFoundException {
         InputStream InputStream = new FileInputStream("\"E:\\桌面\\cqx\\pic\\006rChdqly1hagdz5bck5j30u010zq8l.jpg\"");
 
-        ossClient.putObject("qxmall-xqc","gigi.jpg",InputStream);
+        ossClient.putObject("qxmall-xqc", "gigi.jpg", InputStream);
 
         ossClient.shutdown();
 
