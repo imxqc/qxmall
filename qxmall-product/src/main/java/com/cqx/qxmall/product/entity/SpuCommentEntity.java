@@ -10,8 +10,8 @@ import java.util.Date;
 /**
  * 商品评价
  *
- * @author leifengyang
- * @email leifengyang@gmail.com
+ * @author cqx
+ * @email cqx@gmail.com
  * @date 2019-10-01 21:08:49
  */
 @Data

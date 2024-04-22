@@ -1,8 +1,10 @@
 package com.cqx.qxmall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.cqx.common.to.es.SkuHasStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +30,17 @@ import com.cqx.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    /**
+     * 获取对应sku是否还有内存
+     */
+    @RequestMapping("/hasstock")
+    public R getSkusHasStock(@RequestBody List<Long> skuIds) {
+        List<SkuHasStockVo> vos = wareSkuService.getSkusHasStock(skuIds);
+
+
+        return R.ok().setData(vos);
+    }
 
     /**
      * 列表

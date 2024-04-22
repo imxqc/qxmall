@@ -58,6 +58,6 @@ public class AttrEntity implements Serializable {
      */
     private Integer showDesc;
 
-    private Long attrGroupId;
+//    private Long attrGroupId;
 
 }

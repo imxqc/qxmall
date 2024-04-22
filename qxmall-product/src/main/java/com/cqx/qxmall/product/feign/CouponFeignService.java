@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @version 1.0
  * @date 2024/4/19 20:16
  */
-@FeignClient("qxlimall-coupon")
+@FeignClient("qxmall-coupon")
 public interface CouponFeignService {
     /**
      * 1、CouponFeignService.saveSpuBounds(spuBoundTo);

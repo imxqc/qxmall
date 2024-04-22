@@ -27,12 +27,14 @@ public interface AttrService extends IService<AttrEntity> {
 
     AttrRespVo getAttrInfo(Long attrId);
 
-    void updateAttr(AttrEntity attr);
+    void updateAttr(AttrVo attr);
 
     List<AttrEntity> getRelationAttr(Long attrgroupId);
 
     void deleteRelation(AttrGroupRelationVo[] vos);
 
     PageUtils getNoRelationAttr(Map<String, Object> params, Long attrgroupId);
+
+    List<Long> selectSearchAttrIds(List<Long> attrIds);
 }
 

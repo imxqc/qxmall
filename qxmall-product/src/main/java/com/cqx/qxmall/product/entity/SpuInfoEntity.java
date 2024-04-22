@@ -11,8 +11,8 @@ import java.util.Date;
 /**
  * spu信息
  *
- * @author leifengyang
- * @email leifengyang@gmail.com
+ * @author cqx
+ * @email cqx@gmail.com
  * @date 2019-10-01 21:08:49
  */
 @Data

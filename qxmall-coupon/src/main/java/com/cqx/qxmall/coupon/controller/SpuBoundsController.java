@@ -14,8 +14,8 @@ import java.util.Map;
 /**
  * 商品spu积分设置
  *
- * @author leifengyang
- * @email leifengyang@gmail.com
+ * @author cqx
+ * @email cqx@gmail.com
  * @date 2019-10-08 09:36:40
  */
 @RestController

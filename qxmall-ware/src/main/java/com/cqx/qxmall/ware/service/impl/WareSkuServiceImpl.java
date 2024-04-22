@@ -1,5 +1,6 @@
 package com.cqx.qxmall.ware.service.impl;
 
+import com.cqx.common.to.es.SkuHasStockVo;
 import com.cqx.common.utils.R;
 import com.cqx.qxmall.ware.feign.ProductFeignService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -58,7 +60,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     public void addStock(Long skuId, Long wareId, Integer skuNum) {
         //1、判断如果还没有这个库存记录新增
         List<WareSkuEntity> entities = wareSkuDao.selectList(new QueryWrapper<WareSkuEntity>().eq("sku_id", skuId).eq("ware_id", wareId));
-        if(entities == null || entities.size() == 0){
+        if (entities == null || entities.size() == 0) {
             WareSkuEntity skuEntity = new WareSkuEntity();
             skuEntity.setSkuId(skuId);
             skuEntity.setStock(skuNum);
@@ -69,20 +71,35 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             //TODO 还可以用什么办法让异常出现以后不回滚？高级
             try {
                 R info = productFeignService.info(skuId);
-                Map<String,Object> data = (Map<String, Object>) info.get("skuInfo");
+                Map<String, Object> data = (Map<String, Object>) info.get("skuInfo");
 
-                if(info.getCode() == 0){
+                if (info.getCode() == 0) {
                     skuEntity.setSkuName((String) data.get("skuName"));
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
 
             wareSkuDao.insert(skuEntity);
-        }else{
-            wareSkuDao.addStock(skuId,wareId,skuNum);
+        } else {
+            wareSkuDao.addStock(skuId, wareId, skuNum);
         }
 
+    }
+
+    @Override
+    public List<SkuHasStockVo> getSkusHasStock(List<Long> skuIds) {
+        List<SkuHasStockVo> collect = skuIds.stream().map(id -> {
+            SkuHasStockVo skuHasStockVo = new SkuHasStockVo();
+
+            Long count = baseMapper.getSkuStock(id);
+            skuHasStockVo.setSkuId(id);
+            skuHasStockVo.setHasStock(count == null ? false : count > 0);
+
+            return skuHasStockVo;
+        }).collect(Collectors.toList());
+
+        return collect;
     }
 
 }
