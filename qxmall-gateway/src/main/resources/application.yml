@@ -42,6 +42,10 @@ Spring:
           filters:
             - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
 
+        - id: qxmall_host_route
+          uri: lb://qxmall-product
+          predicates:
+            - Host=**.qxmall.com,qxmall.com
 
 
 

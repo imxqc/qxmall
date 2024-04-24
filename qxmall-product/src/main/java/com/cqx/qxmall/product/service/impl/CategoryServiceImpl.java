@@ -2,6 +2,8 @@ package com.cqx.qxmall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.injector.methods.SelectById;
 import com.cqx.qxmall.product.service.CategoryBrandRelationService;
+import com.cqx.qxmall.product.vo.Catelog2Vo;
+import com.cqx.qxmall.product.vo.Catelog3Vo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,6 +125,52 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
         return baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("cat_level", 1));
+    }
+
+    @Override
+    public Map<String, List<Catelog2Vo>> getCatelogJson() {
+        //原本是多次查询数据库 现查出所有list,后根据条件在list中查 减少了访问数据库的次数
+        List<CategoryEntity> list = baseMapper.selectList(null);
+
+        //查出一级分类的id
+        List<CategoryEntity> level1Categorys = getParent_cid(list, 0L);
+        //封装数据
+        Map<String, List<Catelog2Vo>> Map = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            //查出二级分类
+            List<CategoryEntity> categoryEntities = getParent_cid(list, v.getCatId());
+            //将二级分类封装成二级vo
+            List<Catelog2Vo> catelog2Vos = null;
+            if (categoryEntities != null) {
+                catelog2Vos = categoryEntities.stream().map(l2 -> {
+                    //设置二级分类id name, 一级分类id
+                    Catelog2Vo catelog2Vo = new Catelog2Vo(l2.getCatId().toString(), l2.getName(), v.getCatId().toString(), null);
+                    //查出三级分类
+                    List<CategoryEntity> l3Catelog = getParent_cid(list, l2.getCatId());
+
+                    //三级vo设置三级id,name  二级的id
+                    if (l3Catelog != null) {
+                        List<Catelog3Vo> l3VoList = l3Catelog.stream().map(l3 -> {
+                            Catelog3Vo catelog3Vo = new Catelog3Vo(l3.getCatId().toString(), l3.getName(), l2.getCatId().toString());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+
+                        catelog2Vo.setCatalog3List(l3VoList);
+                    }
+
+                    return catelog2Vo;
+
+                }).collect(Collectors.toList());
+            }
+            return catelog2Vos;
+        }));
+
+        return Map;
+    }
+
+    private List<CategoryEntity> getParent_cid(List<CategoryEntity> list, Long parent_cid) {
+        List<CategoryEntity> collect = list.stream().filter(item -> item.getParentCid() == parent_cid).collect(Collectors.toList());
+
+        return collect;
     }
 
     /**

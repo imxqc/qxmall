@@ -3,6 +3,7 @@ package com.cqx.qxmall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.product.entity.CategoryEntity;
+import com.cqx.qxmall.product.vo.Catelog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -38,5 +39,7 @@ public interface CategoryService extends IService<CategoryEntity> {
     void updateCascade(CategoryEntity category);
 
     List<CategoryEntity> getLevel1Categorys();
+
+    Map<String, List<Catelog2Vo>> getCatelogJson();
 }
 
