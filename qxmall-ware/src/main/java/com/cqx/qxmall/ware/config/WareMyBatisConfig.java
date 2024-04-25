@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableTransactionManagement
-@MapperScan("com.atguigu.gulimall.ware.dao")
+@MapperScan("com.cqx.qxmall.ware.dao")
 @Configuration
 public class WareMyBatisConfig {
 

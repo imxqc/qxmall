@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@FeignClient("gulimall-product")
+@FeignClient("qxmall-product")
 public interface ProductFeignService {
 
     /**
@@ -13,10 +13,10 @@ public interface ProductFeignService {
      *
      *
      *   1)、让所有请求过网关；
-     *          1、@FeignClient("gulimall-gateway")：给gulimall-gateway所在的机器发请求
+     *          1、@FeignClient("qxmall-gateway")：给qxmall-gateway所在的机器发请求
      *          2、/api/product/skuinfo/info/{skuId}
      *   2）、直接让后台指定服务处理
-     *          1、@FeignClient("gulimall-gateway")
+     *          1、@FeignClient("qxmall-gateway")
      *          2、/product/skuinfo/info/{skuId}
      *
      * @return

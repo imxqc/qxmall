@@ -45,7 +45,12 @@ Spring:
         - id: qxmall_host_route
           uri: lb://qxmall-product
           predicates:
-            - Host=**.qxmall.com,qxmall.com
+            - Host=qxmall.com
+
+        - id: qxmall_search_route
+          uri: lb://qxmall-search
+          predicates:
+            - Host=search.qxmall.com
 
 
 
