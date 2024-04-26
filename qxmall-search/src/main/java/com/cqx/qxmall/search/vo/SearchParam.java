@@ -21,6 +21,10 @@ public class SearchParam {
      */
     private Long catalog3Id;
 
+    /**
+     * 排序
+     * 格式 排序属性_ASC/DESC
+     */
     private String sort;
 
     private Integer hasStock;
@@ -36,7 +40,9 @@ public class SearchParam {
     private List<Long> brandId;
 
     /**
-     * 按照属性进行筛选
+     * 按照属性进行筛选 格式:  id_attrval1:attrval2...
+     * id和属性用 _ 分隔
+     * 如有多个属性 用:分隔
      */
     private List<String> attrs;
 

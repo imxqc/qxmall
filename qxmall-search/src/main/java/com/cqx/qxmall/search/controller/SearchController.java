@@ -19,7 +19,7 @@ public class SearchController {
     MallSearchService mallSearchService;
 
 
-    @GetMapping({"/list.html"})
+    @GetMapping({"/list.html","/"})
     public String listPage(SearchParam searchParam,Model model) {
         SearchResult result = mallSearchService.search(searchParam);
         model.addAttribute("result", result);
