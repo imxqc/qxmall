@@ -1,11 +1,16 @@
 package com.cqx.qxmall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.cqx.common.to.es.SkuEsModel;
+import com.cqx.common.utils.R;
 import com.cqx.qxmall.search.QxmallSearchApplication;
 import com.cqx.qxmall.search.config.qxmallElasticSearchConfig;
 import com.cqx.qxmall.search.constant.EsConstant;
+import com.cqx.qxmall.search.feign.ProductFeignService;
 import com.cqx.qxmall.search.service.MallSearchService;
+import com.cqx.qxmall.search.vo.AttrResponseVo;
+import com.cqx.qxmall.search.vo.BrandVo;
 import com.cqx.qxmall.search.vo.SearchParam;
 import com.cqx.qxmall.search.vo.SearchResult;
 import org.apache.commons.lang.StringUtils;
@@ -34,8 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Attr;
 
+import javax.annotation.Resource;
 import javax.swing.*;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +57,9 @@ import java.util.stream.Collectors;
 public class MallSearchServiceImpl implements MallSearchService {
     @Autowired
     RestHighLevelClient client;
+
+    @Resource
+    private ProductFeignService productFeignService;
 
     @Override
     public SearchResult search(SearchParam searchParam) {
@@ -173,6 +184,60 @@ public class MallSearchServiceImpl implements MallSearchService {
         int totalPages = (int) total % EsConstant.PRODUCT_PASIZE == 0 ? (int) total / EsConstant.PRODUCT_PASIZE : (int) (total / EsConstant.PRODUCT_PASIZE + 1);
         result.setTotalPages(totalPages);
 
+        //设置导航页信息
+        ArrayList<Integer> pageNavs = new ArrayList<>();
+        for (int i = 1; i <= totalPages; i++) {
+            pageNavs.add(i);
+        }
+        result.setPageNavs(pageNavs);
+
+        // 6.构建面包屑导航功能
+        if (Param.getAttrs() != null) {
+            List<SearchResult.NavVo> navVos = Param.getAttrs().stream().map(attr -> {
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productFeignService.getAttrsInfo(Long.parseLong(s[0]));
+                // 将已选择的请求参数添加进去 前端页面进行排除
+                result.getAttrIds().add(Long.parseLong(s[0]));
+                if (r.getCode() == 0) {
+                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                    });
+                    navVo.setName(data.getAttrName());
+                } else {
+                    // 失败了就拿id作为名字
+                    navVo.setName(s[0]);
+                }
+                // 拿到所有查询条件 替换查询条件
+                String replace = replaceQueryString(Param, attr, "attrs");
+                navVo.setLink("http://search.qxmall.com/list.html?" + replace);
+                return navVo;
+            }).collect(Collectors.toList());
+            result.setNavs(navVos);
+        }
+
+        // 品牌、分类
+        if (Param.getBrandId() != null && Param.getBrandId().size() > 0) {
+            List<SearchResult.NavVo> navs = result.getNavs();
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            navVo.setName("品牌");
+            // TODO 远程查询所有品牌
+            R r = productFeignService.brandInfo(Param.getBrandId());
+            if (r.getCode() == 0) {
+                List<BrandVo> brand = r.getData("data", new TypeReference<List<BrandVo>>() {
+                });
+                StringBuffer buffer = new StringBuffer();
+                // 替换所有品牌ID
+                String replace = "";
+                for (BrandVo brandVo : brand) {
+                    buffer.append(brandVo.getBrandName() + ";");
+                    replace = replaceQueryString(Param, brandVo.getBrandId() + "", "brandId");
+                }
+                navVo.setNavValue(buffer.toString());
+                navVo.setLink("http://search.qxmall.com/list.html?" + replace);
+            }
+            navs.add(navVo);
+        }
 
         return result;
     }
@@ -207,7 +272,7 @@ public class MallSearchServiceImpl implements MallSearchService {
 
         //按照品牌id查询
         if (param.getBrandId() != null && param.getBrandId().size() > 0) {
-            boolQuery.filter(QueryBuilders.termQuery("brandId", param.getBrandId()));
+            boolQuery.filter(QueryBuilders.termsQuery("brandId", param.getBrandId()));
         }
 
         // 按照价格区间查询
@@ -244,7 +309,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                 // 检索属性
                 String[] attrValues = s[1].split(":");
                 nestedboolQuery.must(QueryBuilders.termQuery("attrs.attrId", attrId));
-                nestedboolQuery.must(QueryBuilders.termQuery("attrs.attrValue", attrValues));
+                nestedboolQuery.must(QueryBuilders.termsQuery("attrs.attrValue", attrValues));
 
                 //每条attr都要生成一个nested查询nestedQuery
                 NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery("attrs", nestedboolQuery, ScoreMode.None);
@@ -254,7 +319,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
 
         //按照库存进行查询
-        if (param.getHasStock()!=null){
+        if (param.getHasStock() != null) {
             boolQuery.filter(QueryBuilders.termQuery("hasStock", param.getHasStock() == 1));
         }
 
@@ -327,5 +392,22 @@ public class MallSearchServiceImpl implements MallSearchService {
         //进行查询操作
         SearchRequest searchRequest = new SearchRequest(new String[]{EsConstant.PRODUCT_INDEX}, sourceBuilder);
         return searchRequest;
+    }
+
+    /**
+     * 替换字符
+     * key ：需要替换的key
+     */
+    private String replaceQueryString(SearchParam Param, String value, String key) {
+        String encode = null;
+        try {
+            encode = URLEncoder.encode(value, "UTF-8");
+            // 浏览器对空格的编码和java的不一样
+            encode = encode.replace("+", "%20");
+            encode = encode.replace("%28", "(").replace("%29", ")");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return Param.get_queryString().replace("&" + key + "=" + encode, "");
     }
 }

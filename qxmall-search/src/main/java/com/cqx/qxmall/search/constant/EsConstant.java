@@ -15,5 +15,5 @@ public class EsConstant {
 	/**
 	 * 分页的大小
 	 */
-	public static final int PRODUCT_PASIZE = 16;
+	public static final int PRODUCT_PASIZE = 8;
 }

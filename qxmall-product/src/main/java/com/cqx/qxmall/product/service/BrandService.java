@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.product.entity.BrandEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,5 +24,7 @@ public interface BrandService extends IService<BrandEntity> {
      * @param brand
      */
     void updateDetail(BrandEntity brand);
+
+    List<BrandEntity> getBrandByIds(List<Long> brandIds);
 }
 

@@ -14,6 +14,11 @@ import java.util.List;
 public class SearchResult {
 
     /**
+     * 导航页
+     */
+    private List<Integer> pageNavs;
+
+    /**
      * 查询到的所有商品信息
      */
     private List<SkuEsModel> products;
@@ -77,5 +82,22 @@ public class SearchResult {
         private String attrName;
 
         private List<String> attrValue;
+    }
+
+    // 面包屑导航相关
+    private List<NavVo> navs = new ArrayList<>();
+
+    /**
+     * 便于判断当前id是否被使用
+     */
+    private List<Long> attrIds = new ArrayList<>();
+
+    @Data
+    public static class NavVo {
+        private String name;
+
+        private String navValue;
+
+        private String link;
     }
 }
