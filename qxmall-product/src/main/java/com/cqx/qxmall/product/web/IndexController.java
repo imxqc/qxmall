@@ -44,7 +44,7 @@ public class IndexController {
         model.addAttribute("categorys", categorys);
 
 
-        //视图解析器会进行拼串
+        //视图解析器会进行拼串(未加responsebody)
         // 从 classpath:/templates 路径下找
         // 返回值 + .html
         return "index";

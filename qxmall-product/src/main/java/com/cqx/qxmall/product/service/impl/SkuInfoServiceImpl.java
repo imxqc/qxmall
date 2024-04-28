@@ -1,5 +1,8 @@
 package com.cqx.qxmall.product.service.impl;
 
+import com.cqx.qxmall.product.entity.SkuImagesEntity;
+import com.cqx.qxmall.product.entity.SpuInfoDescEntity;
+import com.cqx.qxmall.product.vo.SkuItemVo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -97,6 +100,19 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     public List<SkuInfoEntity> getSkusBySpuId(Long spuId) {
         List<SkuInfoEntity> list = this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
         return list;
+    }
+
+    @Override
+    public SkuItemVo item(Long skuId) {
+        //sku基本信息
+
+        //sku图片信息
+
+        //spu销售属性组合
+
+        //spu介绍
+
+        //spu规则参数信息
     }
 
 }
