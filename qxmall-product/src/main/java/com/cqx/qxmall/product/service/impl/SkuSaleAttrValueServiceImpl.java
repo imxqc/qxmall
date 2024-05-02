@@ -8,8 +8,10 @@ import com.cqx.qxmall.product.service.SkuSaleAttrValueService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cqx.qxmall.product.vo.SkuItemSaleAttrVo;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,6 +26,13 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuItemSaleAttrVo> getSaleAttrsBuSpuId(Long spuId) {
+
+        SkuSaleAttrValueDao dao = this.baseMapper;
+        return dao.getSaleAttrsBuSpuId(spuId);
     }
 
 }

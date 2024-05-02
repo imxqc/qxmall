@@ -1,8 +1,10 @@
 package com.cqx.qxmall.product;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cqx.qxmall.product.dao.AttrGroupDao;
 import com.cqx.qxmall.product.entity.BrandEntity;
 import com.cqx.qxmall.product.service.BrandService;
+import com.cqx.qxmall.product.vo.SpuItemAttrGroupVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RedissonClient;
@@ -22,6 +24,9 @@ public class QxmallProductApplicationTests {
     @Autowired
     RedissonClient redissonClient;
 
+    @Autowired
+    AttrGroupDao attrGroupDao;
+
     @Test
     public void test() {
 //        BrandEntity brandEntity = new BrandEntity();
@@ -36,6 +41,12 @@ public class QxmallProductApplicationTests {
         });
     }
 
+
+    @Test
+    public void test2(){
+        List<SpuItemAttrGroupVo> attrGroupWithAttrsBySpuId = attrGroupDao.getAttrGroupWithAttrsBySpuId(6L,225L);
+        System.out.println("attrGroupWithAttrsBySpuId = " + attrGroupWithAttrsBySpuId);
+    }
     @Test
     public void testRedisson(){
         System.out.println(redissonClient);

@@ -3,7 +3,9 @@ package com.cqx.qxmall.product.service;
 import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.product.entity.SkuSaleAttrValueEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cqx.qxmall.product.vo.SkuItemSaleAttrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface SkuSaleAttrValueService extends IService<SkuSaleAttrValueEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    List<SkuItemSaleAttrVo> getSaleAttrsBuSpuId(Long spuId);
 }
 
