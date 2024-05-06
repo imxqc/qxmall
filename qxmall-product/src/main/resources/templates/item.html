@@ -57,9 +57,15 @@
                     </ol>
                 </li>
             </ul>
+
             <ul class="header_ul_right">
-                <li style="border: 0;"><a href="/static/item/../登录页面\index.html" class="aa">你好，请登录</a></li>
-                <li><a href="/static/item/../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+                <li style="border: 0;">
+                    <a href="http://auth.qxmall.com/login.html" th:if="${session.loginUser==null}" class="aa">你好，请登录</a>
+                    <a th:if="${session.loginUser!=null}" class="aa" style="width: 100px">[[${session.loginUser.nickname}]]</a>
+                </li>
+                <li><a href="http://auth.qxmall.com/reg.html" th:if="${session.loginUser==null}" style="color: red;">免费注册</a>
+                    |
+                </li>
                 <li><a href="/static/item/javascript:;" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="/static/item/javascript:;">我的京东</a><span
                         class="glyphicon glyphicon-menu-down">|</span>
@@ -256,7 +262,7 @@
     <nav>
         <div class="nav_min">
             <div class="nav_top">
-                <div class="nav_top_one"><a href="/static/item/#"><img src="/static/item/img/111.png"/></a></div>
+                <div class="nav_top_one"><a href="http://qxmall.com"><img src="/static/item/img/111.png"/></a></div>
                 <div class="nav_top_two"><input type="text"/>
                     <button>搜索</button>
                 </div>
@@ -611,7 +617,8 @@
                         <dl>
                             <dt>选择[[${attr.attrName}]]</dt>
                             <dd th:each="vals:${attr.attrValues}">
-                                <a class="sku_attr_value" th:attr="skus=${vals.skuIds},class=${#lists.contains(#strings.listSplit(vals.skuIds,','),item.info.skuId.toString())?'sku_attr_value checked':'sku_attr_value'}">
+                                <a class="sku_attr_value"
+                                   th:attr="skus=${vals.skuIds},class=${#lists.contains(#strings.listSplit(vals.skuIds,','),item.info.skuId.toString())?'sku_attr_value checked':'sku_attr_value'}">
                                     [[${vals.attrValue}]]
                                     <!--                                    <img src="/static/item/img/59ddfcb1Nc3edb8f1.jpg"/> 摩卡金-->
                                 </a>
@@ -623,7 +630,7 @@
 
                 <div class="box-btns clear">
                     <div class="box-btns-one">
-                        <input type="text" name="" id="" value="1"/>
+                        <input type="text" name="" id="numInput" value="1"/>
                         <div class="box-btns-one1">
 
                             <div>
@@ -640,8 +647,8 @@
                         </div>
                     </div>
                     <div class="box-btns-two">
-                        <a href="/static/item/../商品分类\index.html">
-                            立即预约
+                        <a href="#" id="addToCartA" th:attr="skuId=${item.info.skuId}">
+                            加入购物车
                         </a>
                     </div>
                     <div class="box-btns-three">
@@ -1304,7 +1311,7 @@
 <script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
 <!--<script type="text/javascript"></script>-->
 <script>
-    $(".sku_attr_value").click(function(){
+    $(".sku_attr_value").click(function () {
         var skus = new Array();
         // 1.获取所有加了checked的属性
         // 1.1 点击的元素加上自定义属性
@@ -1320,7 +1327,7 @@
         });
         // 2.取出他们的交集 得到skuId 调用filter方法的一定是jQuery元素
         var filterEle = skus[0];
-        for(var i = 1; i< skus.length;i ++){
+        for (var i = 1; i < skus.length; i++) {
             filterEle = $(filterEle).filter(skus[i]);
         }
         console.log(filterEle[0])
@@ -1328,10 +1335,19 @@
         location.href = "http://item.qxmall.com/" + filterEle[0] + ".html";
     });
 
-    $(function(){
-        $(".sku_attr_value").parent().css({"border":"solid 1px #CCC"});
-        $("a[class='sku_attr_value checked']").parent().css({"border":"solid 1px red"});
+    $(function () {
+        $(".sku_attr_value").parent().css({"border": "solid 1px #CCC"});
+        $("a[class='sku_attr_value checked']").parent().css({"border": "solid 1px red"});
     })
+
+    $("#addToCartA").click(function () {
+        let num = $("#numInput").val();
+        // 获取当前按钮的自定义属性
+        let skuId = $(this).attr("skuId");
+        location.href = "http://cart.qxmall.com/addToCart?skuId=" + skuId + "&num=" + num;
+        return false;
+    })
+
 </script>
 
 </html>

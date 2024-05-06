@@ -52,6 +52,17 @@ Spring:
           predicates:
             - Host=search.qxmall.com
 
+        - id: qxmall_auth_route
+          uri: lb://qxmall-auth-server
+          predicates:
+            - Host=auth.qxmall.com
+
+
+        - id: qxmall_cart_route
+          uri: lb://qxmall-cart
+          predicates:
+            - Host=cart.qxmall.com
+
 
 
 
