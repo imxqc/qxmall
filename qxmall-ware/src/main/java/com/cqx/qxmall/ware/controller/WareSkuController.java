@@ -34,10 +34,9 @@ public class WareSkuController {
     /**
      * 获取对应sku是否还有内存
      */
-    @RequestMapping("/hasstock")
-    public R getSkusHasStock(@RequestBody List<Long> skuIds) {
+    @RequestMapping("/hasStock")
+    public R getSkuHasStock(@RequestBody List<Long> skuIds) {
         List<SkuHasStockVo> vos = wareSkuService.getSkusHasStock(skuIds);
-
 
         return R.ok().setData(vos);
     }

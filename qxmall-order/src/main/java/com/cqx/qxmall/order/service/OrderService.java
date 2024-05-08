@@ -3,8 +3,10 @@ package com.cqx.qxmall.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.order.entity.OrderEntity;
+import com.cqx.qxmall.order.vo.OrderConfirmVo;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * ����
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface OrderService extends IService<OrderEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException;
 }
 

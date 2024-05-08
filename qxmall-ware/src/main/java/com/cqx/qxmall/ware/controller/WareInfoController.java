@@ -1,14 +1,12 @@
 package com.cqx.qxmall.ware.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.cqx.qxmall.ware.vo.FareVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.cqx.qxmall.ware.entity.WareInfoEntity;
 import com.cqx.qxmall.ware.service.WareInfoService;
@@ -28,6 +26,17 @@ import com.cqx.common.utils.R;
 public class WareInfoController {
     @Autowired
     private WareInfoService wareInfoService;
+
+    /**
+     * 获取运费信息 以手机倒数第1位作为运费
+     * @param addrId
+     * @return
+     */
+    @GetMapping("/fare")
+    public R getFare(@RequestParam("addrId") Long addrId){
+        FareVo fare = wareInfoService.getFare(addrId);
+        return R.ok().setData(fare);
+    }
 
     /**
      * 列表

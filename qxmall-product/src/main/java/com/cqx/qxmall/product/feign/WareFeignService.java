@@ -15,6 +15,6 @@ import java.util.List;
  */
 @FeignClient("qxmall-ware")
 public interface WareFeignService {
-    @PostMapping("/ware/waresku/hasstock")
+    @PostMapping("/ware/waresku/hasStock")
     public R getSkuHasStock(@RequestBody List<Long> skuIds);
 }
