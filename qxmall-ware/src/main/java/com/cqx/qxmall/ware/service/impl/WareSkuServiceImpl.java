@@ -1,8 +1,15 @@
 package com.cqx.qxmall.ware.service.impl;
 
+import com.cqx.common.exception.NotStockException;
 import com.cqx.common.to.es.SkuHasStockVo;
 import com.cqx.common.utils.R;
+import com.cqx.qxmall.ware.entity.WareOrderTaskDetailEntity;
+import com.cqx.qxmall.ware.entity.WareOrderTaskEntity;
 import com.cqx.qxmall.ware.feign.ProductFeignService;
+import com.cqx.qxmall.ware.vo.OrderItemVo;
+import com.cqx.qxmall.ware.vo.WareSkuLockVo;
+import lombok.Data;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +26,7 @@ import com.cqx.common.utils.Query;
 import com.cqx.qxmall.ware.dao.WareSkuDao;
 import com.cqx.qxmall.ware.entity.WareSkuEntity;
 import com.cqx.qxmall.ware.service.WareSkuService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
@@ -93,6 +101,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             SkuHasStockVo skuHasStockVo = new SkuHasStockVo();
 
             skuHasStockVo.setSkuId(id);
+
             Long count = baseMapper.getSkuStock(id);
             skuHasStockVo.setHasStock(count == null ? false : count > 0);
 
@@ -100,6 +109,68 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         }).collect(Collectors.toList());
 
         return collect;
+    }
+
+    /**
+     * 为某个订单锁定库存
+     *     @Transactional(rollbackFor = NotStockException.class)  当抛出该方法时,数据库回滚
+     * @param vo
+     * @return
+     */
+    @Transactional(rollbackFor = NotStockException.class)
+    @Override
+    public Boolean orderLockStock(WareSkuLockVo vo) {
+        List<OrderItemVo> locks = vo.getLocks();
+
+        List<SkuWareHasStock> collect = locks.stream().map(item -> {
+            SkuWareHasStock hasStock = new SkuWareHasStock();
+            Long skuId = item.getSkuId();
+            hasStock.setSkuId(skuId);
+            hasStock.setNum(item.getCount());
+
+            // 查询这两个商品在哪有库存
+            List<Long> wareIds = wareSkuDao.listWareIdHasSkuStock(skuId);
+            hasStock.setWareId(wareIds);
+            return hasStock;
+        }).collect(Collectors.toList());
+
+
+        for (SkuWareHasStock hasStock : collect) {
+            Boolean skuStocked = false;
+            Long skuId = hasStock.getSkuId();
+            List<Long> wareIds = hasStock.getWareId();
+
+            if(wareIds == null || wareIds.size() == 0){
+                // 没有任何仓库有这个库存
+                throw new NotStockException(skuId.toString());
+            }
+
+            for (Long wareId : wareIds) {
+                // 成功就返回 1 失败返回0
+                Long count = wareSkuDao.lockSkuStock(skuId, wareId, hasStock.getNum());
+                if(count == 1){
+                    skuStocked=true;
+                    break;
+                }
+                // 当前仓库锁定失败 重试下一个仓库
+            }
+            if(!skuStocked){
+                // 当前商品在所有仓库都没锁柱
+                throw new NotStockException(skuId.toString());
+            }
+        }
+        // 3.全部锁定成功
+        return true;
+    }
+
+    @Data
+    class SkuWareHasStock{
+
+        private Long skuId;
+
+        private List<Long> wareId;
+
+        private Integer num;
     }
 
 }
