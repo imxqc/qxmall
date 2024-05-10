@@ -16,6 +16,7 @@ import com.cqx.qxmall.order.interceptor.LoginUserInterceptor;
 import com.cqx.qxmall.order.service.OrderItemService;
 import com.cqx.qxmall.order.to.OrderCreateTo;
 import com.cqx.qxmall.order.vo.*;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -141,6 +142,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      * @param vo
      * @return
      */
+//    @GlobalTransactional
     @Transactional
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo vo) {
@@ -192,11 +194,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 if(r.getCode() == 0){
                     // 库存足够
                     submitVo.setOrderEntity(order.getOrder());
+                    //制造分布式事务异常
+                    int i = 1/0;
                     return submitVo;
                 }else{
                     // 锁定失败
 //                    submitVo.setCode(3);
 //                    return submitVo;
+
                     //TODO
                     throw new NotStockException("xx");
                 }

@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+<!--seata-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
+<!--        </dependency>-->
+
         <!--        httpUtils所需依赖-->
         <dependency>
             <groupId>com.alibaba</groupId>
