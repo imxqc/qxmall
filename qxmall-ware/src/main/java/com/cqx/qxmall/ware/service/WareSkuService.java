@@ -2,6 +2,7 @@ package com.cqx.qxmall.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cqx.common.to.es.SkuHasStockVo;
+import com.cqx.common.to.mq.StockLockedTo;
 import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.ware.entity.WareSkuEntity;
 import com.cqx.qxmall.ware.vo.WareSkuLockVo;
@@ -26,5 +27,7 @@ public interface WareSkuService extends IService<WareSkuEntity> {
     List<SkuHasStockVo> getSkusHasStock(List<Long> skuIds);
 
     Boolean orderLockStock(WareSkuLockVo vo);
+
+    void unlockStock(StockLockedTo to);
 }
 

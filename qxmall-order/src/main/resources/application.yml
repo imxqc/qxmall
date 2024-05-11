@@ -13,11 +13,6 @@ spring:
         server-addr: 127.0.0.1:8848
   application:
     name: qxmall-order
-  rabbitmq:
-    host: 192.168.149.100 # 你的虚拟机IP
-    port: 15672 # 端口
-    username: guest # 用户名
-    password: guest # 密码
   thymeleaf:
     cache: false
   session:

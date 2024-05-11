@@ -1,5 +1,6 @@
 package com.cqx.qxmall.order;
 
+import com.alibaba.cloud.seata.GlobalTransactionAutoConfiguration;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -15,7 +16,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableFeignClients
 @MapperScan("com.cqx.qxmall.order.dao")
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(exclude = GlobalTransactionAutoConfiguration.class)
 public class QxmallOrderApplication {
 
     public static void main(String[] args) {

@@ -16,7 +16,6 @@ import com.cqx.qxmall.order.interceptor.LoginUserInterceptor;
 import com.cqx.qxmall.order.service.OrderItemService;
 import com.cqx.qxmall.order.to.OrderCreateTo;
 import com.cqx.qxmall.order.vo.*;
-import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -213,6 +212,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             }
         }
 //        return submitVo;
+    }
+
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+
     }
 
 
