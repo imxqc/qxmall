@@ -7,6 +7,13 @@ Spring:
         server-addr: 127.0.0.1:8848
     gateway:
       routes:
+        - id: coupon_route
+          uri: lb://qxmall-coupon
+          predicates:
+            - Path=/api/coupon/**
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
         - id: product_route
           uri: lb://qxmall-product
           predicates:
@@ -66,6 +73,11 @@ Spring:
           uri: lb://qxmall-order
           predicates:
             - Host=order.qxmall.com
+
+        - id: qxmall_member_route
+          uri: lb://qxmall-member
+          predicates:
+            - Host=member.qxmall.com
 
 
 

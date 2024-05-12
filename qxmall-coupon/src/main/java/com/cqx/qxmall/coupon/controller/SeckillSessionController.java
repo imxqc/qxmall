@@ -1,14 +1,11 @@
 package com.cqx.qxmall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.cqx.qxmall.coupon.entity.SeckillSessionEntity;
 import com.cqx.qxmall.coupon.service.SeckillSessionService;
@@ -28,6 +25,13 @@ import com.cqx.common.utils.R;
 public class SeckillSessionController {
     @Autowired
     private SeckillSessionService seckillSessionService;
+
+
+    @GetMapping("/lates3DaySession")
+    public R getLate3DaySession(){
+        List<SeckillSessionEntity> seckillSessionEntities = seckillSessionService.getLate3DaySession();
+        return R.ok().setData(seckillSessionEntities);
+    }
 
     /**
      * 列表

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.cqx.common.enume.OrderStatusEnum;
 import com.cqx.common.exception.NotStockException;
 import com.cqx.common.to.es.SkuHasStockVo;
+import com.cqx.common.to.mq.OrderTo;
 import com.cqx.common.to.mq.StockDetailTo;
 import com.cqx.common.to.mq.StockLockedTo;
 import com.cqx.common.utils.R;
@@ -286,6 +287,30 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             }
         }else{
             // 无需解锁
+        }
+    }
+
+    /**
+     * 防止订单服务卡顿, 库存消息优先到期, 导致本来订单取消但库存消费
+     * 当mq收到orderTo的消息后就说明订单正在或者已经取消了, 所以本方法将订单状态为锁定的库存解锁
+     * @param to
+     */
+    @Transactional
+    @Override
+    public void unlockStock(OrderTo to) {
+        log.info("\n订单超时自动关闭,准备解锁库存");
+        String orderSn = to.getOrderSn();
+        // 查一下最新的库存状态 防止重复解锁库存[Order服务可能会提前解锁]
+        WareOrderTaskEntity taskEntity = orderTaskService.getOrderTaskByOrderSn(orderSn);
+
+        Long taskEntityId = taskEntity.getId();
+        // 按照工作单找到所有 没有解锁的库存 进行解锁 状态为1等于已锁定
+        List<WareOrderTaskDetailEntity> entities = orderTaskDetailService.list(new QueryWrapper<WareOrderTaskDetailEntity>()
+                .eq("task_id", taskEntityId).eq("lock_status", 1));
+
+        //进行解锁
+        for (WareOrderTaskDetailEntity entity : entities) {
+            unLock(entity.getSkuId(), entity.getWareId(), entity.getSkuNum(), entity.getId());
         }
     }
 

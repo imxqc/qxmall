@@ -4,6 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.cqx.common.enume.OrderStatusEnum;
 import com.cqx.common.exception.NotStockException;
+import com.cqx.common.to.mq.OrderTo;
 import com.cqx.common.utils.R;
 import com.cqx.common.vo.MemberRsepVo;
 import com.cqx.qxmall.order.constant.OrderConstant;
@@ -16,6 +17,10 @@ import com.cqx.qxmall.order.interceptor.LoginUserInterceptor;
 import com.cqx.qxmall.order.service.OrderItemService;
 import com.cqx.qxmall.order.to.OrderCreateTo;
 import com.cqx.qxmall.order.vo.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -45,6 +50,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 
 @Service("orderService")
+@Slf4j
 public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> implements OrderService {
     @Autowired
     private MemberFeignService memberFeignService;
@@ -69,6 +75,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -194,15 +203,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     // 库存足够
                     submitVo.setOrderEntity(order.getOrder());
                     //制造分布式事务异常
-                    int i = 1/0;
+//                    int i = 1/0;
+                    rabbitTemplate.convertAndSend("order-event-exchange", "order.create.order", order.getOrder());
+
                     return submitVo;
                 }else{
                     // 锁定失败
 //                    submitVo.setCode(3);
 //                    return submitVo;
-
-                    //TODO
-                    throw new NotStockException("xx");
+                    String msg = (String) r.get("msg");
+                    throw new NotStockException(msg);
                 }
 
             }else {
@@ -218,6 +228,67 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     public OrderEntity getOrderByOrderSn(String orderSn) {
         return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
 
+    }
+
+    @Override
+    public void closeOrder(OrderEntity entity) {
+        log.info("\n收到过期的订单信息--准关闭订单:" + entity.getOrderSn());
+        // 查询这个订单的最新状态
+        OrderEntity orderEntity = this.getById(entity.getId());
+        if(orderEntity.getStatus() == OrderStatusEnum.CREATE_NEW.getCode()){
+            OrderEntity update = new OrderEntity();
+            update.setId(entity.getId());
+            update.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(update);
+            // 发送给MQ告诉它有一个订单被自动关闭了
+            OrderTo orderTo = new OrderTo();
+            BeanUtils.copyProperties(orderEntity, orderTo);
+
+            try {
+                // 保证消息 100% 发出去 每一个消息在数据库保存详细信息
+                // 定期扫描数据库 将失败的消息在发送一遍  此消息发送给库存的release队列
+                rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
+            } catch (AmqpException e) {
+                // 将没发送成功的消息进行重试发送.
+            }
+        }
+    }
+
+    @Override
+    public PayVo getOrderPay(String orderSn) {
+        PayVo payVo = new PayVo();
+        OrderEntity order = this.getOrderByOrderSn(orderSn);
+        // 保留2位小数位向上补齐
+        payVo.setTotal_amount(order.getTotalAmount().add(order.getFreightAmount()==null?new BigDecimal("0"):order.getFreightAmount()).setScale(2,BigDecimal.ROUND_UP).toString());
+        payVo.setOut_trade_no(order.getOrderSn());
+        List<OrderItemEntity> entities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", order.getOrderSn()));
+        payVo.setSubject("qxmall");
+        payVo.setBody("qxmall");
+        if(null != entities.get(0).getSkuName() && entities.get(0).getSkuName().length() > 1){
+//			payVo.setSubject(entities.get(0).getSkuName());
+//			payVo.setBody(entities.get(0).getSkuName());
+            payVo.setSubject("qxmall");
+            payVo.setBody("qxmall");
+        }
+        return payVo;
+    }
+
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        MemberRsepVo rsepVo = LoginUserInterceptor.loginUser.get();
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                // 查询这个用户的最新订单 [降序排序]
+                new QueryWrapper<OrderEntity>().eq("member_id",rsepVo.getId()).orderByDesc("id")
+        );
+        List<OrderEntity> order_sn = page.getRecords().stream().map(order -> {
+            // 查询这个订单关联的所有订单项
+            List<OrderItemEntity> orderSn = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", order.getOrderSn()));
+            order.setItemEntities(orderSn);
+            return order;
+        }).collect(Collectors.toList());
+        page.setRecords(order_sn);
+        return new PageUtils(page);
     }
 
 

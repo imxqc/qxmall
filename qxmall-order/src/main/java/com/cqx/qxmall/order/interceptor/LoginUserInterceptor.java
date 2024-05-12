@@ -24,8 +24,11 @@ public class LoginUserInterceptor implements HandlerInterceptor {
 
         String uri = request.getRequestURI();
         // 这个支付跳转登录页的请求直接放行
-        boolean match = new AntPathMatcher().match("/order/order/status/**", uri);
-        if(match){
+        AntPathMatcher matcher = new AntPathMatcher();
+
+        boolean match1 =   matcher .match("/order/order/status/**", uri);
+        boolean match2 =   matcher .match("/payed/notify", uri);
+        if(match1 || match2){
             return true;
         }
 

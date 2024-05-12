@@ -5,6 +5,7 @@ import com.cqx.common.utils.PageUtils;
 import com.cqx.qxmall.order.entity.OrderEntity;
 import com.cqx.qxmall.order.vo.OrderConfirmVo;
 import com.cqx.qxmall.order.vo.OrderSubmitVo;
+import com.cqx.qxmall.order.vo.PayVo;
 import com.cqx.qxmall.order.vo.SubmitOrderResponseVo;
 
 import java.util.Map;
@@ -26,5 +27,11 @@ public interface OrderService extends IService<OrderEntity> {
     SubmitOrderResponseVo submitOrder(OrderSubmitVo submitVo);
 
     OrderEntity getOrderByOrderSn(String orderSn);
+
+    void closeOrder(OrderEntity entity);
+
+    PayVo getOrderPay(String orderSn);
+
+    PageUtils queryPageWithItem(Map<String, Object> params);
 }
 
