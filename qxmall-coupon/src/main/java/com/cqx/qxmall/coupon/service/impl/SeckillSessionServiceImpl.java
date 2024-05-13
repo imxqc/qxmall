@@ -1,6 +1,8 @@
 package com.cqx.qxmall.coupon.service.impl;
 
 import com.cqx.qxmall.coupon.entity.SeckillSkuRelationEntity;
+import com.cqx.qxmall.coupon.service.SeckillSkuRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +26,9 @@ import com.cqx.qxmall.coupon.service.SeckillSessionService;
 
 @Service("seckillSessionService")
 public class SeckillSessionServiceImpl extends ServiceImpl<SeckillSessionDao, SeckillSessionEntity> implements SeckillSessionService {
+    @Autowired
+    private SeckillSkuRelationService skuRelationService;
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -39,15 +44,15 @@ public class SeckillSessionServiceImpl extends ServiceImpl<SeckillSessionDao, Se
     public List<SeckillSessionEntity> getLate3DaySession() {
 // 计算最近三天的时间
         List<SeckillSessionEntity> list = this.list(new QueryWrapper<SeckillSessionEntity>().between("start_time", startTime(), endTime()));
-//        if (list != null && list.size() > 0) {
-//            return list.stream().map(session -> {
-//                // 给每一个活动写入他们的秒杀项
-//                Long id = session.getId();
-//                List<SeckillSkuRelationEntity> entities = skuRelationService.list(new QueryWrapper<SeckillSkuRelationEntity>().eq("promotion_session_id", id));
-//                session.setRelationSkus(entities);
-//                return session;
-//            }).collect(Collectors.toList());
-//        }
+        if (list != null && list.size() > 0) {
+            return list.stream().map(session -> {
+                // 给每一个活动写入他们的秒杀项
+                Long id = session.getId();
+                List<SeckillSkuRelationEntity> entities = skuRelationService.list(new QueryWrapper<SeckillSkuRelationEntity>().eq("promotion_session_id", id));
+                session.setRelationSkus(entities);
+                return session;
+            }).collect(Collectors.toList());
+        }
         return null;
     }
 

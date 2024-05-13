@@ -79,6 +79,11 @@ Spring:
           predicates:
             - Host=member.qxmall.com
 
+        - id: qxmall_seckill_route
+          uri: lb://qxmall-seckill
+          predicates:
+            - Host=seckill.qxmall.com
+
 
 
 

@@ -24,11 +24,16 @@ public class SkuItemVo {
     List<SkuItemSaleAttrVo> saleAttr;
 
     //spu介绍
-    SpuInfoDescEntity desp;
+    SpuInfoDescEntity desc;
 
     //spu规则参数信息
     List<SpuItemAttrGroupVo> groupAttrs;
 
     //库存信息
     Boolean hasStock = true;
+
+    /**
+     * 秒杀信息
+     */
+    SeckillInfoVo seckillInfo;
 }
