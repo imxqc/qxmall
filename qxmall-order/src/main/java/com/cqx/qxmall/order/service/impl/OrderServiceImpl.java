@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.cqx.common.enume.OrderStatusEnum;
 import com.cqx.common.exception.NotStockException;
 import com.cqx.common.to.mq.OrderTo;
+import com.cqx.common.to.mq.SecKillOrderTo;
 import com.cqx.common.utils.R;
 import com.cqx.common.vo.MemberRsepVo;
 import com.cqx.qxmall.order.constant.OrderConstant;
@@ -289,6 +290,44 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }).collect(Collectors.toList());
         page.setRecords(order_sn);
         return new PageUtils(page);
+    }
+
+    @Override
+    public void createSecKillOrder(SecKillOrderTo secKillOrderTo) {
+        log.info("\n创建秒杀订单");
+        OrderEntity entity = new OrderEntity();
+        entity.setOrderSn(secKillOrderTo.getOrderSn());
+        entity.setMemberId(secKillOrderTo.getMemberId());
+        entity.setCreateTime(new Date());
+        entity.setPayAmount(secKillOrderTo.getSeckillPrice());
+        entity.setTotalAmount(secKillOrderTo.getSeckillPrice());
+        entity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        entity.setPayType(1);
+        // TODO 还有hen多的没设置
+
+        BigDecimal price = secKillOrderTo.getSeckillPrice().multiply(new BigDecimal("" + secKillOrderTo.getNum()));
+        entity.setPayAmount(price);
+
+        this.save(entity);
+
+        // 保存订单项信息
+        OrderItemEntity itemEntity = new OrderItemEntity();
+        itemEntity.setOrderSn(secKillOrderTo.getOrderSn());
+        itemEntity.setRealAmount(price);
+        itemEntity.setOrderId(entity.getId());
+        itemEntity.setSkuQuantity(secKillOrderTo.getNum());
+        R info = productFeignService.getSkuInfoBySkuId(secKillOrderTo.getSkuId());
+        SpuInfoVo spuInfo = info.getData(new TypeReference<SpuInfoVo>() {});
+        itemEntity.setSpuId(spuInfo.getId());
+        itemEntity.setSpuBrand(spuInfo.getBrandId().toString());
+        itemEntity.setSpuName(spuInfo.getSpuName());
+        itemEntity.setCategoryId(spuInfo.getCatalogId());
+        itemEntity.setGiftGrowth(secKillOrderTo.getSeckillPrice().multiply(new BigDecimal(secKillOrderTo.getNum())).intValue());
+        itemEntity.setGiftIntegration(secKillOrderTo.getSeckillPrice().multiply(new BigDecimal(secKillOrderTo.getNum())).intValue());
+        itemEntity.setPromotionAmount(new BigDecimal("0.0"));
+        itemEntity.setCouponAmount(new BigDecimal("0.0"));
+        itemEntity.setIntegrationAmount(new BigDecimal("0.0"));
+        orderItemService.save(itemEntity);
     }
 
 

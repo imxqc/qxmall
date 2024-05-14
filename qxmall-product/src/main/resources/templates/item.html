@@ -5,10 +5,77 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" type="text/css" href="/static/item/scss/shop.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/item/scss/jd.css"/>
+<!--    <link rel="stylesheet" type="text/css" href="/static/item/scss/jd.css"/>-->
+    <link rel="stylesheet" type="text/css" href="/static/item/scss/main.css"/>
+<!--    <link rel="stylesheet" type="text/css" href="/static/item/scss/SHOUhou.css"/>-->
     <link rel="stylesheet" href="/static/item/scss/header.css"/>
     <link rel="stylesheet" type="text/css" href="/static/item/bootstrap/css/bootstrap.css"/>
+
+    <script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function() {
+            alert("dom")
+            $(".sku_attr_value").click(function () {
+                var skus = new Array();
+                // 1.获取所有加了checked的属性
+                // 1.1 点击的元素加上自定义属性
+                $(this).addClass("clicked");
+                var curr = $(this).attr("skus").split(",");
+                // 当前被点击的所有sku组合的数组放进去
+                skus.push(curr)
+                // 去掉同一行所有的checked
+                $(this).parent().parent().find(".sku_attr_value").removeClass("checked");
+
+                $("a[class='sku_attr_value checked']").each(function () {
+                    skus.push($(this).attr("skus").split(","));
+                });
+                // 2.取出他们的交集 得到skuId 调用filter方法的一定是jQuery元素
+                var filterEle = skus[0];
+                for (var i = 1; i < skus.length; i++) {
+                    filterEle = $(filterEle).filter(skus[i]);
+                }
+                console.log(filterEle[0])
+                // 3.跳转
+                location.href = "http://item.qxmall.com/" + filterEle[0] + ".html";
+            });
+
+            $(function () {
+                $(".sku_attr_value").parent().css({"border": "solid 1px #CCC"});
+                $("a[class='sku_attr_value checked']").parent().css({"border": "solid 1px red"});
+            })
+
+            $("#addToCartA").click(function () {
+                let num = $("#numInput").val();
+                // 获取当前按钮的自定义属性
+                let skuId = $(this).attr("skuId");
+                location.href = "http://cart.qxmall.com/addToCart?skuId=" + skuId + "&num=" + num;
+                return false;
+            })
+
+            $("#secKillA").click(function () {
+                var isLogin = [[${session.loginUser != null}]]
+                if(isLogin){
+                    var killId = $(this).attr("sessionid") + "-" + $(this).attr("skuid");
+                    var num = $("#numInput").val();
+                    location.href = "http://seckill.qxmall.com/kill?killId=" + killId + "&key=" + $(this).attr("code") + "&num=" + num;
+                }else{
+                   alert("请先登录")
+                }
+                return false;
+            })
+
+
+
+        });
+    </script>
+
+
 </head>
+
 <body>
 <div id="max">
     <header>
@@ -525,7 +592,7 @@
                         </li>
                         <li style="color: red" th:if="${item.seckillInfo!=null}">
                             <span th:if="${#dates.createNow().getTime() < item.seckillInfo.startTime}">商品将会在 [[${#dates.format(new java.util.Date(item.seckillInfo.startTime),"yyyy-MM-dd HH:mm:ss")}]] 进行秒杀</span>
-                            <span th:if="${#dates.createNow().getTime() >= item.seckillInfo.startTime && #dates.createNow().getTime() <= item.seckillInfo.endTime}">秒杀价： [[${#numbers.formatDecimal(item.seckillInfo.seckillPrice,1,2)}]]</span>
+                            <span th:if="${(#dates.createNow().getTime() >= item.seckillInfo.startTime) && (#dates.createNow().getTime() <= item.seckillInfo.endTime)}">秒杀价： [[${#numbers.formatDecimal(item.seckillInfo.seckillPrice,1,2)}]]</span>
                         </li>
                         <li>
                         <li>
@@ -648,11 +715,18 @@
 
                         </div>
                     </div>
-                    <div class="box-btns-two">
-                        <a  id="addToCartA" th:attr="skuId=${item.info.skuId}">
+
+                    <div class="box-btns-two" th:if="${item.seckillInfo != null && (#dates.createNow().getTime() >= item.seckillInfo.startTime && #dates.createNow().getTime() <= item.seckillInfo.endTime)}">
+                        <a id="secKillA" th:attr="skuId=${item.info.skuId},sessionId=${item.seckillInfo.promotionSessionId},code=${item.seckillInfo.randomCode}">
+                            立即抢购
+                        </a>
+                    </div>
+                    <div class="box-btns-two" th:if="${item.seckillInfo == null || (#dates.createNow().getTime() < item.seckillInfo.startTime || #dates.createNow().getTime() > item.seckillInfo.endTime)}">
+                        <a id="addToCartA" th:attr="skuId=${item.info.skuId}">
                             加入购物车
                         </a>
                     </div>
+
                     <div class="box-btns-three">
                         <img src="/static/item/img/e4ed3606843f664591ff1f68f7fda12d.png" alt=""/> 分享
                     </div>
@@ -1309,47 +1383,9 @@
 </div>
 </body>
 
-<script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
-<!--<script type="text/javascript"></script>-->
-<script>
-    $(".sku_attr_value").click(function () {
-        var skus = new Array();
-        // 1.获取所有加了checked的属性
-        // 1.1 点击的元素加上自定义属性
-        $(this).addClass("clicked");
-        var curr = $(this).attr("skus").split(",");
-        // 当前被点击的所有sku组合的数组放进去
-        skus.push(curr)
-        // 去掉同一行所有的checked
-        $(this).parent().parent().find(".sku_attr_value").removeClass("checked");
 
-        $("a[class='sku_attr_value checked']").each(function () {
-            skus.push($(this).attr("skus").split(","));
-        });
-        // 2.取出他们的交集 得到skuId 调用filter方法的一定是jQuery元素
-        var filterEle = skus[0];
-        for (var i = 1; i < skus.length; i++) {
-            filterEle = $(filterEle).filter(skus[i]);
-        }
-        console.log(filterEle[0])
-        // 3.跳转
-        location.href = "http://item.qxmall.com/" + filterEle[0] + ".html";
-    });
 
-    $(function () {
-        $(".sku_attr_value").parent().css({"border": "solid 1px #CCC"});
-        $("a[class='sku_attr_value checked']").parent().css({"border": "solid 1px red"});
-    })
 
-    $("#addToCartA").click(function () {
-        let num = $("#numInput").val();
-        // 获取当前按钮的自定义属性
-        let skuId = $(this).attr("skuId");
-        location.href = "http://cart.qxmall.com/addToCart?skuId=" + skuId + "&num=" + num;
-        return false;
-    })
 
-</script>
 
 </html>
